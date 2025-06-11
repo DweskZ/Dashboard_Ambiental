@@ -1,43 +1,22 @@
-// import "reflect-metadata";
-// import { DataSource } from "typeorm";
-// import { User } from "./models/User"; 
-// import { Weather } from "./models/Weather"; 
-//
-// export const AppDataSource = new DataSource({
-//   type: "postgres",
-//   host: "localhost",
-//   port: 5433,
-//   username: "user",
-//   password: "password",
-//   database: "clima",
-//   synchronize: true,
-//   logging: true,
-//   entities: [User, Weather],
-// });
+import "reflect-metadata";
+import { DataSource } from "typeorm";
+import { User } from "./models/User";
+import { Weather } from "./models/Weather";
 
-    import "reflect-metadata";
-    import { DataSource } from "typeorm";
-    import { User } from "./models/User";
-    import { Weather } from "./models/Weather";
-    // Clase Singleton para la instancia de DataSource
-    class AppDataSourceSingleton {
-      // Variable estática para almacenar la única instancia de DataSource
-      private static instance: DataSource;
+class AppDataSourceSingleton {
+  private static instance: DataSource;
 
-      // Constructor privado para impedir instancias directas
-      private constructor() {}
+  private constructor() {}
 
-      // Método estático para obtener la única instancia de DataSource
-        // Método estático para obtener la única instancia de DataSource
   public static getInstance(): DataSource {
     if (!AppDataSourceSingleton.instance) {
       AppDataSourceSingleton.instance = new DataSource({
         type: "postgres",
-        host: "localhost",
-        port: 5433,
-        username: "user",
-        password: "password",
-        database: "clima",
+        host: process.env.DB_HOST || "localhost",
+        port: Number(process.env.DB_PORT) || 5433,
+        username: process.env.DB_USER || "user",
+        password: process.env.DB_PASSWORD || "password",
+        database: process.env.DB_NAME || "clima",
         synchronize: true,
         logging: true,
         entities: [User, Weather],
@@ -48,5 +27,4 @@
   }
 }
 
-// Exportar la instancia para usarla en toda la app
 export const AppDataSource = AppDataSourceSingleton.getInstance();

@@ -1,0 +1,46 @@
+name: Deploy to Azure Web App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Build Docker image
+        run: |
+          docker build -t $REGISTRY_NAME.azurecr.io/$IMAGE_NAME:$GITHUB_SHA .
+        env:
+          REGISTRY_NAME: ${{ secrets.ACR_NAME }}
+          IMAGE_NAME: dashboardambiental
+
+      - name: Login to Azure Container Registry
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.ACR_NAME }}.azurecr.io
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Push image
+        run: |
+          docker push $REGISTRY_NAME.azurecr.io/$IMAGE_NAME:$GITHUB_SHA
+        env:
+          REGISTRY_NAME: ${{ secrets.ACR_NAME }}
+          IMAGE_NAME: dashboardambiental
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          images: ${{ secrets.ACR_NAME }}.azurecr.io/dashboardambiental:$GITHUB_SHA
+          slot-name: Production

@@ -52,11 +52,12 @@ const historial = ref([])
 async function loginUser(email, password) {
   authMsg.value = ""
   authMsgType.value = "login"
-  const resp = await fetch('http://localhost:3000/api/auth/simple-login', {
+  const resp = await fetch('/api/auth/simple-login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })
   })
+
   if (resp.ok) {
     const data = await resp.json()
     user.value = data.user
@@ -76,7 +77,7 @@ async function loginUser(email, password) {
 async function registerUser(email, password) {
   authMsg.value = ""
   authMsgType.value = "register"
-  const resp = await fetch('http://localhost:3000/api/auth/register', {
+  const resp = await fetch('/api/auth/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })
@@ -108,7 +109,7 @@ function logout() {
  */
 async function buscarClima(ciudad) {
   if (!user.value || !ciudad) return
-  await fetch('http://localhost:3000/api/weather/search', {
+  await fetch('/api/weather/search', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email: user.value.email, city: ciudad }),
@@ -122,7 +123,7 @@ async function buscarClima(ciudad) {
  */
 async function obtenerHistorial() {
   if (!user.value) return
-  const resp = await fetch(`http://localhost:3000/api/weather/history/${user.value.email}`)
+  const resp = await fetch(`/api/weather/history/${user.value.email}`)
   if (resp.ok) {
     historial.value = await resp.json()
   }

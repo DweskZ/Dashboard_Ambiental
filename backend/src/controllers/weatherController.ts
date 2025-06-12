@@ -18,9 +18,10 @@ export const searchAndSaveWeather = async (req: Request, res: Response) => {
     const user = await userRepo.findOne({ where: { email } });
     if (!user) return res.status(404).json({ message: "Usuario no encontrado" });
 
-  const apiKey = process.env.OPENWEATHER_KEY;
+    const apiKey = process.env.OPENWEATHER_KEY;
     console.log("🧪 Clave de OpenWeather recibida:", apiKey);
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
     const response = await axios.get(url);
     const data = response.data;
 
@@ -49,8 +50,13 @@ export const searchAndSaveWeather = async (req: Request, res: Response) => {
       icono: `http://openweathermap.org/img/wn/${clima.icon}@2x.png`,
       fecha: clima.date
     });
-  } catch (error) {
-    res.status(500).json({ message: "Error al obtener clima", error });
+
+  } catch (error: any) {
+    console.error("❌ Error al obtener clima:", error.response?.data || error.message);
+    res.status(500).json({
+      message: "Error al obtener clima",
+      detalle: error.response?.data || error.message,
+    });
   }
 };
 
@@ -69,10 +75,11 @@ export const getUserWeatherHistory = async (req: Request, res: Response) => {
     });
 
     res.json(history);
-} catch (error: any) {
-  console.error("❌ Error al obtener clima:", error.response?.data || error.message);
-  res.status(500).json({
-    message: "Error al obtener clima",
-    detalle: error.response?.data || error.message,
-  });
-}
+  } catch (error: any) {
+    console.error("❌ Error al obtener historial:", error.message);
+    res.status(500).json({
+      message: "Error al obtener historial",
+      detalle: error.message,
+    });
+  }
+};

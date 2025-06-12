@@ -19,6 +19,7 @@ export const searchAndSaveWeather = async (req: Request, res: Response) => {
     if (!user) return res.status(404).json({ message: "Usuario no encontrado" });
 
   const apiKey = process.env.OPENWEATHER_KEY;
+    console.log("🧪 Clave de OpenWeather recibida:", apiKey);
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
     const response = await axios.get(url);
     const data = response.data;
@@ -68,7 +69,10 @@ export const getUserWeatherHistory = async (req: Request, res: Response) => {
     });
 
     res.json(history);
-  } catch (error) {
-    res.status(500).json({ message: "Error al obtener historial", error });
-  }
-};
+} catch (error: any) {
+  console.error("❌ Error al obtener clima:", error.response?.data || error.message);
+  res.status(500).json({
+    message: "Error al obtener clima",
+    detalle: error.response?.data || error.message,
+  });
+}
